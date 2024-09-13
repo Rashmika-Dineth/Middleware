@@ -70,6 +70,10 @@ errorHandler = (error, req, res, next) => {
     }
 }
 
+app.all("*", (req,res) => {
+    res.status(404);
+    throw new Error("Route not Found");
+})
 app.use(errorHandler);
 app.listen(port, ()=>{
     console.log("App listing on port ", port)
