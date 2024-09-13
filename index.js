@@ -1,8 +1,7 @@
-const express = require('express')
-const app = express()
-
+const express = require('express');
+const app = express();
+const router = express.Router();
 const port =3000;
-
 
 // Application middleware 
 const loggerMiddleware = (req, res, next) =>{
@@ -10,8 +9,59 @@ const loggerMiddleware = (req, res, next) =>{
     next();
 }
 
-app.use(loggerMiddleware);
+const fakeAuth = (req, res, next) => {
+    const authStatus = false;
+    if(authStatus){
+        console.log("User Auth status : ", authStatus);
+        next();
+    }
+    else{
+        res.status(401);
+        throw new Error("User not Authorized")
+    }
+}
 
+app.use(loggerMiddleware);
+app.use("/api/users", router);
+
+const getUser = (req,res)=>{
+    res.json({message: "Get All Users"});
+}
+const createUser = (req,res)=>{
+    res.json({message: "Create new user"});
+}
+
+router.use(fakeAuth);
+router.route("/").get(getUser).post(createUser)
+
+errorHandler = (error, req, res, next) => {
+    const statusCode = res.statusCode ? res.statusCode : 500 ;
+    res.status(statusCode);
+    switch(statusCode){
+        case 401:
+            res.json({
+                title: "Unauthorized",
+                message: error.message
+            })
+        break;
+        case 404:
+            res.json({
+                title: "Not Found",
+                message: error.message
+            })
+        break;
+        case 500:
+            res.json({
+                title: "Server Error",
+                message: error.message
+            })
+        break;
+        default:            
+        break;
+    }
+}
+
+app.use(errorHandler);
 app.listen(port, ()=>{
     console.log("App listing on port ", port)
 })
