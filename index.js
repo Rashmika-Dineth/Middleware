@@ -3,11 +3,27 @@ const app = express();
 const router = express.Router();
 const port =3000;
 const path = require("path");
+var morgan = require('morgan')
+const multer  = require('multer');
+const { error } = require('console');
+const upload = multer({ dest: 'uploads/' })
 
 //Inbuild middleware 
 app.use(express.json());
+app.use(morgan('combined'));
 app.use(express.urlencoded({extended: true}))
 app.use("/static",express.static(path.join(__dirname,"public")));
+
+//3rd Party Application middleware
+app.post('/profile', upload.single('image'), function (req, res, next) {
+    console.log()
+    // req.file is the `avatar` file
+    // req.body will hold the text fields, if there were any
+    res.send();
+  },(error,req,res,next) =>{
+res.status(400).send({error : error.message})
+  }
+)
 
 // Application middleware 
 const loggerMiddleware = (req, res, next) =>{
