@@ -2,6 +2,12 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const port =3000;
+const path = require("path");
+
+//Inbuild middleware 
+app.use(express.json());
+app.use(express.urlencoded({extended: true}))
+app.use("/static",express.static(path.join(__dirname,"public")));
 
 // Application middleware 
 const loggerMiddleware = (req, res, next) =>{
@@ -10,7 +16,7 @@ const loggerMiddleware = (req, res, next) =>{
 }
 
 const fakeAuth = (req, res, next) => {
-    const authStatus = false;
+    const authStatus = true;
     if(authStatus){
         console.log("User Auth status : ", authStatus);
         next();
@@ -22,12 +28,15 @@ const fakeAuth = (req, res, next) => {
 }
 
 app.use(loggerMiddleware);
+
+// Router level middleware
 app.use("/api/users", router);
 
 const getUser = (req,res)=>{
     res.json({message: "Get All Users"});
 }
 const createUser = (req,res)=>{
+    console.log("This is the sample body", req.body)
     res.json({message: "Create new user"});
 }
 
